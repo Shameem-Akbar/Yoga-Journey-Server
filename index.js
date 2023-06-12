@@ -30,7 +30,13 @@ async function run() {
         const database = client.db("yogaDB");
         const usersCollection = database.collection("users");
 
-        //users api
+        //users getting api
+        app.get('/users', async (req, res) => {
+            const result = await usersCollection.find().toArray();
+            res.send(result);
+        });
+
+        //users making api
         app.post('/users', async (req, res) => {
             const user = req.body;
             const query = { email: user.email }
