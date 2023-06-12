@@ -46,6 +46,7 @@ async function run() {
 
         const database = client.db("yogaDB");
         const usersCollection = database.collection("users");
+        const classesCollection = database.collection("classes");
 
         //jwt token
         app.post('/jwt', (req, res) => {
@@ -149,6 +150,12 @@ async function run() {
             const query = { email: email }
             const user = await usersCollection.findOne(query);
             const result = { instructor: user?.role === 'instructor' }
+            res.send(result);
+        })
+
+        app.post('/classes', verifyJWT, verifyInstructor, async (req, res) => {
+            const newClass = req.body;
+            const result = await classesCollection.insertOne(newClass)
             res.send(result);
         })
 
