@@ -153,6 +153,12 @@ async function run() {
             res.send(result);
         })
 
+        //classes api
+        app.get('/classes', async (req, res) => {
+            const result = await classesCollection.find().toArray();
+            res.send(result);
+        })
+
         app.post('/classes', verifyJWT, verifyInstructor, async (req, res) => {
             const newClass = req.body;
             const result = await classesCollection.insertOne(newClass)
