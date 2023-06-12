@@ -54,6 +54,17 @@ async function run() {
             res.send({ token })
         })
 
+        //admin verifying middleware
+        const verifyAdmin = async (req, res, next) => {
+            const email = req.decoded.email;
+            const query = { email: email }
+            const user = await usersCollection.findOne(query);
+            if (user?.role !== 'admin') {
+                return res.status(403).send({ error: true, message: 'forbidden message' });
+            }
+            next();
+        }
+
 
         //users getting api
         app.get('/users', verifyJWT, async (req, res) => {
