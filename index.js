@@ -1,6 +1,7 @@
 const express = require('express');
 const app = express();
 const cors = require('cors');
+const jwt = require('jsonwebtoken');
 const port = process.env.PORT || 5000;
 require("dotenv").config();
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
@@ -29,6 +30,14 @@ async function run() {
 
         const database = client.db("yogaDB");
         const usersCollection = database.collection("users");
+
+        //jwt token
+        app.post('/jwt', (req, res) => {
+            const user = req.body;
+            const token = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '24h' })
+            res.send({ token })
+        })
+
 
         //users getting api
         app.get('/users', async (req, res) => {
