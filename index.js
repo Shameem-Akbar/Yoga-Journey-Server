@@ -1,11 +1,12 @@
+require("dotenv").config();
 const express = require('express');
+const jwt = require('jsonwebtoken');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
+const port = process.env.PORT || 5000;
+const stripe = require('stripe')(process.env.PAYMENT_SECRET_KEY);
+
 const app = express();
 const cors = require('cors');
-const jwt = require('jsonwebtoken');
-const stripe = require('stripe')(process.env.PAYMENT_SECRET_KEY)
-const port = process.env.PORT || 5000;
-require("dotenv").config();
-const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 
 //middleware
 app.use(cors());
@@ -49,6 +50,7 @@ async function run() {
         const usersCollection = database.collection("users");
         const classesCollection = database.collection("classes");
         const studentClassesCollection = database.collection("studentClasses");
+        const paymentCollection = database.collection("payments");
 
         //jwt token
         app.post('/jwt', (req, res) => {
@@ -260,7 +262,17 @@ async function run() {
             })
         })
 
-
+        //payment related api
+        app.post('/payments', verifyJWT, async (req, res) => {
+            const { payment, price, className } = req.body;
+            const insertResult = await paymentCollection.insertOne(payment);
+            const userEmail = req.decoded.email;
+            const deleteResult = await studentClassesCollection.deleteOne({ email: userEmail, className: className });
+            const updateResult = await classesCollection.updateOne(
+                { className: className },
+                { $inc: { enrolledStudents: 1, availableSeats: -1 } })
+            res.send({ insertResult, deleteResult, updateResult });
+        })
 
         // Send a ping to confirm a successful connection
         await client.db("admin").command({ ping: 1 });
