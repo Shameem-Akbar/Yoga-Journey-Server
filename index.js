@@ -161,6 +161,18 @@ async function run() {
             res.send(result);
         })
 
+        //popular class api
+        app.get('/popular-classes', async (req, res) => {
+            const classes = await classesCollection.find().sort({ enrolledStudents: -1 }).limit(6).toArray();
+            res.send(classes);
+        })
+
+        //popular instructor api
+        app.get('/popular-instructors', async (req, res) => {
+            const classes = await classesCollection.find().limit(6).toArray();
+            res.send(classes);
+        })
+
         //get class by email for each instructor
         app.get('/my-classes/:email', async (req, res) => {
             try {
