@@ -47,6 +47,7 @@ async function run() {
         const database = client.db("yogaDB");
         const usersCollection = database.collection("users");
         const classesCollection = database.collection("classes");
+        const studentClassesCollection = database.collection("studentClasses");
 
         //jwt token
         app.post('/jwt', (req, res) => {
@@ -152,7 +153,7 @@ async function run() {
         })
 
         //classes api
-        app.get('/classes', verifyJWT, async (req, res) => {
+        app.get('/classes', async (req, res) => {
             const result = await classesCollection.find().toArray();
             res.send(result);
         })
@@ -215,6 +216,13 @@ async function run() {
             const result = await classesCollection.updateOne(filter, updateDoc);
             res.send(result);
         });
+
+        //selected classes
+        app.post('/selected-classes', async (req, res) => {
+            const item = req.body;
+            const result = await studentClassesCollection.insertOne(item);
+            res.send(result);
+        })
 
         // Send a ping to confirm a successful connection
         await client.db("admin").command({ ping: 1 });
