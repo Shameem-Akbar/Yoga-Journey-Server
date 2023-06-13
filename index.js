@@ -217,10 +217,16 @@ async function run() {
             res.send(result);
         });
 
-        //selected classes
+        //selected classes post api
         app.post('/selected-classes', async (req, res) => {
             const item = req.body;
             const result = await studentClassesCollection.insertOne(item);
+            res.send(result);
+        })
+
+        //selected class get api
+        app.get('/selected-classes', async (req, res) => {
+            const result = await studentClassesCollection.find().toArray();
             res.send(result);
         })
 
