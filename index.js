@@ -192,6 +192,19 @@ async function run() {
             res.send(result);
         })
 
+        // Deny class
+        app.patch('/classes/:id/deny', async (req, res) => {
+            const id = req.params.id;
+            console.log(id);
+            const filter = { _id: new ObjectId(id) };
+            const updateDoc = {
+                $set: {
+                    status: 'denied'
+                },
+            };
+            const result = await classesCollection.updateOne(filter, updateDoc);
+            res.send(result);
+        });
 
         // Send a ping to confirm a successful connection
         await client.db("admin").command({ ping: 1 });
