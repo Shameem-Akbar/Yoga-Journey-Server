@@ -154,14 +154,41 @@ async function run() {
         })
 
         //classes api
-        app.get('/classes', async (req, res) => {
+        app.get('/classes', verifyJWT, async (req, res) => {
             const result = await classesCollection.find().toArray();
             res.send(result);
         })
 
+        //get class by email for each instructor
+        app.get('/my-classes/:email', async (req, res) => {
+            try {
+                const email = req.params.email;
+                console.log(email);
+                const classes = await classesCollection.find({ instructorEmail: email }).toArray();
+                res.send(classes);
+            } catch (error) {
+                console.error(error);
+            }
+        })
+
+        //post new class
         app.post('/classes', verifyJWT, verifyInstructor, async (req, res) => {
             const newClass = req.body;
             const result = await classesCollection.insertOne(newClass)
+            res.send(result);
+        })
+
+        //approve class
+        app.patch('/classes/:id', async (req, res) => {
+            const id = req.params.id;
+            console.log(id);
+            const filter = { _id: new ObjectId(id) };
+            const updateDoc = {
+                $set: {
+                    status: 'approved'
+                },
+            };
+            const result = await classesCollection.updateOne(filter, updateDoc);
             res.send(result);
         })
 
