@@ -224,11 +224,27 @@ async function run() {
             res.send(result);
         })
 
-        //selected class get api
-        app.get('/selected-classes', async (req, res) => {
-            const result = await studentClassesCollection.find().toArray();
+        //selected class get api for individual student
+        app.get('/selected-classes/:email', async (req, res) => {
+            try {
+                const email = req.params.email;
+                console.log(email);
+                const result = await studentClassesCollection.find({ email: email }).toArray();
+                res.send(result);
+            } catch (error) {
+                console.error(error);
+            }
+        })
+
+        //delete selected class
+        app.delete('/selected-classes/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: new ObjectId(id) };
+            const result = await studentClassesCollection.deleteOne(query);
             res.send(result);
         })
+
+
 
         // Send a ping to confirm a successful connection
         await client.db("admin").command({ ping: 1 });
