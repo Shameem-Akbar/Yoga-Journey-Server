@@ -231,7 +231,6 @@ async function run() {
         app.get('/selected-classes/:email', async (req, res) => {
             try {
                 const email = req.params.email;
-                console.log(email);
                 const result = await studentClassesCollection.find({ email: email }).toArray();
                 res.send(result);
             } catch (error) {
@@ -264,7 +263,7 @@ async function run() {
 
         //payment related api
         app.post('/payments', verifyJWT, async (req, res) => {
-            const { payment, price, className } = req.body;
+            const { payment, className } = req.body;
             const insertResult = await paymentCollection.insertOne(payment);
             const userEmail = req.decoded.email;
             const deleteResult = await studentClassesCollection.deleteOne({ email: userEmail, className: className });
@@ -272,6 +271,17 @@ async function run() {
                 { className: className },
                 { $inc: { enrolledStudents: 1, availableSeats: -1 } })
             res.send({ insertResult, deleteResult, updateResult });
+        })
+
+        //paid classes api
+        app.get('/payments/:email', async (req, res) => {
+            try {
+                const email = req.params.email;
+                const result = await paymentCollection.find({ email: email }).sort({ date: -1 }).toArray();
+                res.send(result);
+            } catch (error) {
+                console.error(error);
+            }
         })
 
         // Send a ping to confirm a successful connection
