@@ -100,7 +100,6 @@ async function run() {
         //admin making api
         app.patch('/users/admin/:id', async (req, res) => {
             const id = req.params.id;
-            console.log(id);
             const filter = { _id: new ObjectId(id) };
             const updateDoc = {
                 $set: {
@@ -128,7 +127,6 @@ async function run() {
         //instructor making api
         app.patch('/users/instructor/:id', async (req, res) => {
             const id = req.params.id;
-            console.log(id);
             const filter = { _id: new ObjectId(id) };
             const updateDoc = {
                 $set: {
@@ -181,7 +179,6 @@ async function run() {
         //approve class
         app.patch('/classes/:id', async (req, res) => {
             const id = req.params.id;
-            console.log(id);
             const filter = { _id: new ObjectId(id) };
             const updateDoc = {
                 $set: {
@@ -195,11 +192,24 @@ async function run() {
         // Deny class
         app.patch('/classes/:id/deny', async (req, res) => {
             const id = req.params.id;
-            console.log(id);
             const filter = { _id: new ObjectId(id) };
             const updateDoc = {
                 $set: {
                     status: 'denied'
+                },
+            };
+            const result = await classesCollection.updateOne(filter, updateDoc);
+            res.send(result);
+        });
+
+        // feedback of class
+        app.patch('/feedback/:id', async (req, res) => {
+            const id = req.params.id;
+            const { feedback } = req.body;
+            const filter = { _id: new ObjectId(id) };
+            const updateDoc = {
+                $set: {
+                    feedback: feedback,
                 },
             };
             const result = await classesCollection.updateOne(filter, updateDoc);
